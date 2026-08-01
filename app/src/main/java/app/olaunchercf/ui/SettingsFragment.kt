@@ -97,15 +97,6 @@ class SettingsFragment : Fragment() {
     @Composable
     private fun Settings(fontSize: TextUnit = TextUnit.Unspecified) {
         val selected = remember { mutableStateOf("") }
-        /*val fs = remember { mutableStateOf(fontSize) }
-
-        val titleFs = if (fs.value.isSpecified) {
-            (fs.value.value * 2).sp
-        } else fs.value
-
-        val iconFs = if (fs.value.isSpecified) {
-            (fs.value.value * 1.5).sp
-        } else fs.value */
 
         val changeLauncherText = if (isOlauncherDefault(requireContext())) {
             R.string.change_default_launcher
@@ -113,7 +104,7 @@ class SettingsFragment : Fragment() {
            R.string.set_as_default_launcher
         }
 
-        Column {
+        Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
             SettingsTopView(
                 stringResource(R.string.app_name),
                 onClick = { openAppInfo(requireContext(), android.os.Process.myUserHandle(), BuildConfig.APPLICATION_ID) },
@@ -125,6 +116,52 @@ class SettingsFragment : Fragment() {
                     resetDefaultLauncher(requireContext())
                 }
             }
+
+            // --- NEW: ORBC CONTROLS SECTION ---
+            SettingsArea(
+                title = "Orbc Controls",
+                selected = selected,
+                items = arrayOf(
+                    { _, onChange ->
+                        SettingsToggle(
+                            title = "Enable App Drawer",
+                            onChange = onChange,
+                            state = remember { mutableStateOf(!prefs.isAppDrawerDisabled) },
+                        ) { prefs.isAppDrawerDisabled = !prefs.isAppDrawerDisabled }
+                    },
+                    { _, onChange ->
+                        SettingsToggle(
+                            title = "Orbital App Drawer Arc",
+                            onChange = onChange,
+                            state = remember { mutableStateOf(prefs.isDrawerOrbitalEnabled) },
+                        ) { prefs.isDrawerOrbitalEnabled = !prefs.isDrawerOrbitalEnabled }
+                    },
+                    { _, onChange ->
+                        SettingsToggle(
+                            title = "Haptic Tick Feedback",
+                            onChange = onChange,
+                            state = remember { mutableStateOf(prefs.isHapticsEnabled) },
+                        ) { prefs.isHapticsEnabled = !prefs.isHapticsEnabled }
+                    },
+                    { open, onChange ->
+                        SettingsNumberItem(
+                            title = "Curvature Depth (%)",
+                            open = open,
+                            onChange = onChange,
+                            currentSelection = remember { mutableStateOf((prefs.drawerCurveRadius * 100).toInt()) },
+                            min = 10,
+                            max = 80,
+                            onValueChange = { },
+                            onSelect = { factor ->
+                                val fl = factor / 100f
+                                prefs.drawerCurveRadius = fl
+                                prefs.homeCurveRadius = fl
+                            }
+                        )
+                    }
+                )
+            )
+
             SettingsArea(
                 title = stringResource(R.string.appearance),
                 selected = selected,
@@ -456,13 +493,11 @@ class SettingsFragment : Fragment() {
     }
 
     private fun setTheme(appTheme: Constants.Theme) {
-        // if (AppCompatDelegate.getDefaultNightMode() == appTheme) return // TODO find out what this did
         prefs.appTheme = appTheme
         requireActivity().recreate()
     }
 
     private fun setLang(lang_int: Constants.Language) {
-
         prefs.language = lang_int
         requireActivity().recreate()
     }
