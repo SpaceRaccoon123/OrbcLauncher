@@ -366,4 +366,32 @@ class Prefs(val context: Context) {
     fun clear() {
         prefs.edit().clear().apply()
     }
+    // Orbc Launcher Custom Preferences
+    var isHomeOrbitalEnabled: Boolean
+        get() = prefs.getBoolean("HOME_ORBITAL_ENABLED", true)
+        set(value) = prefs.edit().putBoolean("HOME_ORBITAL_ENABLED", value).apply()
+
+    var isDrawerOrbitalEnabled: Boolean
+        get() = prefs.getBoolean("DRAWER_ORBITAL_ENABLED", true)
+        set(value) = prefs.edit().putBoolean("DRAWER_ORBITAL_ENABLED", value).apply()
+
+    var homeCurveRadius: Float
+        get() = prefs.getFloat("HOME_CURVE_RADIUS", 0.35f)
+        set(value) = prefs.edit().putFloat("HOME_CURVE_RADIUS", value).apply()
+
+    var drawerCurveRadius: Float
+        get() = prefs.getFloat("DRAWER_CURVE_RADIUS", 0.35f)
+        set(value) = prefs.edit().putFloat("DRAWER_CURVE_RADIUS", value).apply()
+
+    var isHapticsEnabled: Boolean
+        get() = prefs.getBoolean("HAPTICS_ENABLED", true)
+        set(value) = prefs.edit().putBoolean("HAPTICS_ENABLED", value).apply()
+
+    var isAppDrawerDisabled: Boolean
+        get() = prefs.getBoolean("APP_DRAWER_DISABLED", false)
+        set(value) = prefs.edit().putBoolean("APP_DRAWER_DISABLED", value).apply()
+
+    var homeAppMode: String
+        get() = prefs.getString("HOME_APP_MODE", "FAVORITES") ?: "FAVORITES"
+        set(value) = prefs.edit().putString("HOME_APP_MODE", value).apply()
 }
