@@ -1,5 +1,23 @@
-<?xml version="1.0" encoding="utf-8"?>
-<adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
-    <background android:drawable="@mipmap/olaunchercf_background" />
-    <foreground android:drawable="@mipmap/olaunchercf_foreground" />
-</adaptive-icon>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- Inclined Orbital Ellipse Track -->
+    <path
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="3.5"
+        android:strokeLineCap="round"
+        android:pathData="M 28,68 C 22,48 40,32 64,34 C 84,36 90,52 74,64 C 60,74 34,78 28,68 Z" />
+
+    <!-- Core Celestial Node -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M 54,48 A 6,6 0 1 0 54,60 A 6,6 0 1 0 54,48 Z" />
+
+    <!-- Orbital Satellite Bead -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M 76,46 A 3.5,3.5 0 1 0 76,53 A 3.5,3.5 0 1 0 76,46 Z" />
+</vector>
