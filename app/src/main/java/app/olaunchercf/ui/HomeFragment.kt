@@ -30,7 +30,6 @@ import app.olaunchercf.listener.OnSwipeTouchListener
 import app.olaunchercf.listener.ViewSwipeTouchListener
 import kotlinx.coroutines.launch
 
-
 class HomeFragment : Fragment(), View.OnClickListener, View.OnLongClickListener {
 
     private lateinit var prefs: Prefs
@@ -58,7 +57,6 @@ class HomeFragment : Fragment(), View.OnClickListener, View.OnLongClickListener 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-
         viewModel = activity?.run {
             ViewModelProvider(this)[MainViewModel::class.java]
         } ?: throw Exception("Invalid Activity")
@@ -67,7 +65,6 @@ class HomeFragment : Fragment(), View.OnClickListener, View.OnLongClickListener 
         vibrator = context?.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
 
         initObservers()
-
         initSwipeTouchListener()
         initClickListeners()
     }
@@ -78,13 +75,11 @@ class HomeFragment : Fragment(), View.OnClickListener, View.OnLongClickListener 
 
         binding.clock.textSize = prefs.textSize * 2.5f
         binding.date.textSize = prefs.textSize.toFloat()
-
     }
 
     override fun onResume() {
         super.onResume()
 
-        // only show "set as default"-button if tips are GONE
         if (binding.firstRunTips.visibility == View.GONE) {
             binding.setDefaultLauncher.visibility =
                 if (isOlauncherDefault(requireContext())) View.GONE else View.VISIBLE
@@ -107,7 +102,7 @@ class HomeFragment : Fragment(), View.OnClickListener, View.OnLongClickListener 
             }
             R.id.setDefaultLauncher -> viewModel.resetDefaultLauncherApp(requireContext())
             else -> {
-                try { // Launch app
+                try {
                     val appLocation = view.id.toString().toInt()
                     homeAppClicked(appLocation)
                 } catch (e: Exception) {
@@ -172,6 +167,9 @@ class HomeFragment : Fragment(), View.OnClickListener, View.OnLongClickListener 
     }
 
     private fun showAppList(flag: AppDrawerFlag, showHiddenApps: Boolean = false, n: Int = 0) {
+        // Respect preference to disable App Drawer completely
+        if (prefs.isAppDrawerDisabled && flag == AppDrawerFlag.LaunchApp) return
+
         viewModel.getAppList(showHiddenApps)
         lifecycleScope.launch {
             try {
@@ -231,14 +229,13 @@ class HomeFragment : Fragment(), View.OnClickListener, View.OnLongClickListener 
         else openCameraApp(requireContext())
     }
 
-    // This function handles all swipe actions that a independent of the actual swipe direction
     @SuppressLint("NewApi")
     private fun handleOtherAction(action: Action) {
         when(action) {
             Action.ShowNotification -> expandNotificationDrawer(requireContext())
             Action.LockScreen -> lockPhone()
             Action.ShowAppList -> showAppList(AppDrawerFlag.LaunchApp)
-            Action.OpenApp -> {} // this should be handled in the respective onSwipe[Down,Right,Left] functions
+            Action.OpenApp -> {}
             Action.OpenQuickSettings -> expandQuickSettings(requireContext())
             Action.ShowRecents -> initActionService(requireContext())?.showRecents()
             Action.Disabled -> {}
@@ -311,7 +308,6 @@ class HomeFragment : Fragment(), View.OnClickListener, View.OnLongClickListener 
                 super.onLongClick()
                 try {
                     findNavController().navigate(R.id.action_mainFragment_to_settingsFragment)
-                    // viewModel.firstOpen(false)
                 } catch (e: java.lang.Exception) {
                 }
             }
@@ -372,18 +368,16 @@ class HomeFragment : Fragment(), View.OnClickListener, View.OnLongClickListener 
         }
     }
 
-    // updates number of apps visible on home screen
-    // does nothing if number has not changed
     private fun updateAppCount(newAppsNum: Int) {
-        val oldAppsNum = binding.homeAppsLayout.size // current number
+        val oldAppsNum = binding.homeAppsLayout.size
         val diff = oldAppsNum - newAppsNum
 
-        if (diff in 1 until oldAppsNum) { // 1 <= diff <= oldNumApps
+        if (diff in 1 until oldAppsNum) {
             binding.homeAppsLayout.children.drop(diff)
         } else if (diff < 0) {
-            val alignment = prefs.homeAlignment.value() // make only one call to prefs and store here
+            val alignment = prefs.homeAlignment.value()
+            val centerIndex = (newAppsNum - 1) / 2f
 
-            // add all missing apps to list
             for (i in oldAppsNum until newAppsNum) {
                 val view = layoutInflater.inflate(R.layout.home_app_button, null) as TextView
                 view.apply {
@@ -398,6 +392,15 @@ class HomeFragment : Fragment(), View.OnClickListener, View.OnLongClickListener 
                         )
                     }
                     gravity = alignment
+
+                    // Controlled linear horizontal arc offset for static home items
+                    if (prefs.isHomeOrbitalEnabled) {
+                        val distanceFromCenter = kotlin.math.abs(i - centerIndex)
+                        val shift = (distanceFromCenter * 15f * prefs.homeCurveRadius)
+                        translationX = if (prefs.homeAlignment.value() == Gravity.RIGHT) shift else -shift
+                    } else {
+                        translationX = 0f
+                    }
                 }
                 binding.homeAppsLayout.addView(view)
             }
