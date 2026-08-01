@@ -17,9 +17,9 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import app.olaunchercf.MainViewModel
+import app.olaunchercf.OrbitalLayoutManager
 import app.olaunchercf.R
 import app.olaunchercf.data.AppModel
 import app.olaunchercf.data.Constants
@@ -38,7 +38,6 @@ class AppDrawerFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        // return inflater.inflate(R.layout.fragment_app_drawer, container, false)
         _binding = FragmentAppDrawerBinding.inflate(inflater, container, false)
 
         context?.let{
@@ -80,7 +79,9 @@ class AppDrawerFragment : Fragment() {
             ViewModelProvider(this)[MainViewModel::class.java]
         } ?: throw Exception("Invalid Activity")
 
-        val gravity = when(Prefs(requireContext()).drawerAlignment) {
+        val prefs = Prefs(requireContext())
+
+        val gravity = when(prefs.drawerAlignment) {
             Constants.Gravity.Left -> Gravity.LEFT
             Constants.Gravity.Center -> Gravity.CENTER
             Constants.Gravity.Right -> Gravity.RIGHT
@@ -100,7 +101,15 @@ class AppDrawerFragment : Fragment() {
 
         initViewModel(flag, viewModel, appAdapter)
 
-        binding.recyclerView.layoutManager = LinearLayoutManager(requireContext())
+        // Attach Orbital Layout Manager to the App Drawer RecyclerView
+        binding.recyclerView.layoutManager = OrbitalLayoutManager(
+            context = requireContext(),
+            radiusFactor = prefs.drawerCurveRadius,
+            isRightHanded = (prefs.drawerAlignment == Constants.Gravity.Right),
+            isOrbitalEnabled = prefs.isDrawerOrbitalEnabled,
+            isHapticsEnabled = prefs.isHapticsEnabled
+        )
+
         binding.recyclerView.adapter = appAdapter
         binding.recyclerView.addOnScrollListener(getRecyclerViewOnScrollListener())
 
@@ -207,6 +216,7 @@ class AppDrawerFragment : Fragment() {
 
             if (newSet.isEmpty()) findNavController().popBackStack()
         }
+
     private fun appRenameListener(): (appPackage: String, appAlias: String) -> Unit =
         { appPackage, appAlias ->
             val prefs = Prefs(requireContext())
