@@ -311,17 +311,14 @@ class HomeFragment : Fragment(), View.OnClickListener, View.OnLongClickListener 
             }
 
             override fun onLongClick() {
-    super.onLongClick()
-    try {
-        findNavController().navigate(R.id.action_mainFragment_to_settingsFragment)
-    } catch (e: Exception) {
-        try {
-            findNavController().navigate(R.id.settingsFragment)
-        } catch (navEx: Exception) {
-            navEx.printStackTrace()
-        }
-    }
-            }
+                super.onLongClick()
+                try {
+                    findNavController().navigate(R.id.action_mainFragment_to_settingsFragment)
+                } catch (e: Exception) {
+                    try {
+                        findNavController().navigate(R.id.settingsFragment)
+                    } catch (navEx: Exception) {
+                        navEx.printStackTrace()
                     }
                 }
             }
