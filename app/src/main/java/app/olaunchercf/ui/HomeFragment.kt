@@ -103,7 +103,7 @@ class HomeFragment : Fragment(), View.OnClickListener, View.OnLongClickListener 
             R.id.setDefaultLauncher -> viewModel.resetDefaultLauncherApp(requireContext())
             else -> {
                 try {
-                    val appLocation = view.id.toString().toInt()
+                    val appLocation = view.id
                     homeAppClicked(appLocation)
                 } catch (e: Exception) {
                     e.printStackTrace()
@@ -158,8 +158,12 @@ class HomeFragment : Fragment(), View.OnClickListener, View.OnLongClickListener 
     }
 
     private fun homeAppClicked(location: Int) {
-        if (prefs.getAppName(location).isEmpty()) showLongPressToast()
-        else launchApp(prefs.getHomeAppModel(location))
+        val appModel = prefs.getHomeAppModel(location)
+        if (appModel.appPackage.isEmpty()) {
+            showAppList(AppDrawerFlag.SetHomeApp, false, location)
+        } else {
+            launchApp(appModel)
+        }
     }
 
     private fun launchApp(appModel: AppModel) {
@@ -167,7 +171,6 @@ class HomeFragment : Fragment(), View.OnClickListener, View.OnLongClickListener 
     }
 
     private fun showAppList(flag: AppDrawerFlag, showHiddenApps: Boolean = false, n: Int = 0) {
-        // Respect preference to disable App Drawer completely
         if (prefs.isAppDrawerDisabled && flag == AppDrawerFlag.LaunchApp) return
 
         viewModel.getAppList(showHiddenApps)
@@ -178,11 +181,14 @@ class HomeFragment : Fragment(), View.OnClickListener, View.OnLongClickListener 
                     bundleOf("flag" to flag.toString(), "n" to n)
                 )
             } catch (e: Exception) {
-                findNavController().navigate(
-                    R.id.appListFragment,
-                    bundleOf("flag" to flag.toString())
-                )
-                e.printStackTrace()
+                try {
+                    findNavController().navigate(
+                        R.id.appListFragment,
+                        bundleOf("flag" to flag.toString(), "n" to n)
+                    )
+                } catch (navEx: Exception) {
+                    navEx.printStackTrace()
+                }
             }
         }
     }
@@ -231,7 +237,7 @@ class HomeFragment : Fragment(), View.OnClickListener, View.OnLongClickListener 
 
     @SuppressLint("NewApi")
     private fun handleOtherAction(action: Action) {
-        when(action) {
+        when (action) {
             Action.ShowNotification -> expandNotificationDrawer(requireContext())
             Action.LockScreen -> lockPhone()
             Action.ShowAppList -> showAppList(AppDrawerFlag.LaunchApp)
@@ -274,7 +280,7 @@ class HomeFragment : Fragment(), View.OnClickListener, View.OnLongClickListener 
         return object : OnSwipeTouchListener(context) {
             override fun onSwipeLeft() {
                 super.onSwipeLeft()
-                when(val action = prefs.swipeLeftAction) {
+                when (val action = prefs.swipeLeftAction) {
                     Action.OpenApp -> openSwipeLeftApp()
                     else -> handleOtherAction(action)
                 }
@@ -282,7 +288,7 @@ class HomeFragment : Fragment(), View.OnClickListener, View.OnLongClickListener 
 
             override fun onSwipeRight() {
                 super.onSwipeRight()
-                when(val action = prefs.swipeRightAction) {
+                when (val action = prefs.swipeRightAction) {
                     Action.OpenApp -> openSwipeRightApp()
                     else -> handleOtherAction(action)
                 }
@@ -290,7 +296,7 @@ class HomeFragment : Fragment(), View.OnClickListener, View.OnLongClickListener 
 
             override fun onSwipeUp() {
                 super.onSwipeUp()
-                when(val action = prefs.swipeUpAction) {
+                when (val action = prefs.swipeUpAction) {
                     Action.OpenApp -> openSwipeUpApp()
                     else -> handleOtherAction(action)
                 }
@@ -298,7 +304,7 @@ class HomeFragment : Fragment(), View.OnClickListener, View.OnLongClickListener 
 
             override fun onSwipeDown() {
                 super.onSwipeDown()
-                when(val action = prefs.swipeDownAction) {
+                when (val action = prefs.swipeDownAction) {
                     Action.OpenApp -> openSwipeDownApp()
                     else -> handleOtherAction(action)
                 }
@@ -308,13 +314,18 @@ class HomeFragment : Fragment(), View.OnClickListener, View.OnLongClickListener 
                 super.onLongClick()
                 try {
                     findNavController().navigate(R.id.action_mainFragment_to_settingsFragment)
-                } catch (e: java.lang.Exception) {
+                } catch (e: Exception) {
+                    try {
+                        findNavController().navigate(R.id.settingsFragment)
+                    } catch (navEx: Exception) {
+                        navEx.printStackTrace()
+                    }
                 }
             }
 
             override fun onDoubleClick() {
                 super.onDoubleClick()
-                when(val action = prefs.doubleTapAction) {
+                when (val action = prefs.doubleTapAction) {
                     Action.OpenApp -> openDoubleTapApp()
                     else -> handleOtherAction(action)
                 }
@@ -333,10 +344,10 @@ class HomeFragment : Fragment(), View.OnClickListener, View.OnLongClickListener 
                 super.onClick(view)
                 textOnClick(view)
             }
-            
+
             override fun onSwipeLeft() {
                 super.onSwipeLeft()
-                when(val action = prefs.swipeLeftAction) {
+                when (val action = prefs.swipeLeftAction) {
                     Action.OpenApp -> openSwipeLeftApp()
                     else -> handleOtherAction(action)
                 }
@@ -344,7 +355,7 @@ class HomeFragment : Fragment(), View.OnClickListener, View.OnLongClickListener 
 
             override fun onSwipeRight() {
                 super.onSwipeRight()
-                when(val action = prefs.swipeRightAction) {
+                when (val action = prefs.swipeRightAction) {
                     Action.OpenApp -> openSwipeRightApp()
                     else -> handleOtherAction(action)
                 }
@@ -352,7 +363,7 @@ class HomeFragment : Fragment(), View.OnClickListener, View.OnLongClickListener 
 
             override fun onSwipeUp() {
                 super.onSwipeUp()
-                when(val action = prefs.swipeUpAction) {
+                when (val action = prefs.swipeUpAction) {
                     Action.OpenApp -> openSwipeUpApp()
                     else -> handleOtherAction(action)
                 }
@@ -360,7 +371,7 @@ class HomeFragment : Fragment(), View.OnClickListener, View.OnLongClickListener 
 
             override fun onSwipeDown() {
                 super.onSwipeDown()
-                when(val action = prefs.swipeDownAction) {
+                when (val action = prefs.swipeDownAction) {
                     Action.OpenApp -> openSwipeDownApp()
                     else -> handleOtherAction(action)
                 }
@@ -383,21 +394,26 @@ class HomeFragment : Fragment(), View.OnClickListener, View.OnLongClickListener 
                 view.apply {
                     textSize = prefs.textSize.toFloat()
                     id = i
-                    text = prefs.getHomeAppModel(i).appLabel
+
+                    val appModel = prefs.getHomeAppModel(i)
+                    text = if (appModel.appLabel.isNotEmpty()) appModel.appLabel else "Select App"
+
+                    setPadding(32, 12, 32, 12)
                     setOnTouchListener(getHomeAppsGestureListener(context, this))
-                    if (!prefs.extendHomeAppsArea) {
-                        layoutParams = ViewGroup.LayoutParams(
-                            ViewGroup.LayoutParams.WRAP_CONTENT,
-                            ViewGroup.LayoutParams.WRAP_CONTENT
-                        )
-                    }
+
+                    val lp = ViewGroup.MarginLayoutParams(
+                        ViewGroup.LayoutParams.WRAP_CONTENT,
+                        ViewGroup.LayoutParams.WRAP_CONTENT
+                    )
+                    lp.setMargins(0, 12, 0, 12)
+                    layoutParams = lp
+
                     gravity = alignment
 
-                    // Controlled linear horizontal arc offset for static home items
                     if (prefs.isHomeOrbitalEnabled) {
                         val distanceFromCenter = kotlin.math.abs(i - centerIndex)
-                        val shift = (distanceFromCenter * 15f * prefs.homeCurveRadius)
-                        translationX = if (prefs.homeAlignment.value() == Gravity.RIGHT) shift else -shift
+                        val shift = (distanceFromCenter * 16f * prefs.homeCurveRadius)
+                        translationX = if (prefs.homeAlignment.value() == Gravity.RIGHT) -shift else shift
                     } else {
                         translationX = 0f
                     }
