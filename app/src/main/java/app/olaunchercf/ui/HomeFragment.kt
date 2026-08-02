@@ -195,7 +195,7 @@ class HomeFragment : Fragment(), View.OnClickListener, View.OnLongClickListener 
 
     private fun openSwipeRightApp() {
         if (prefs.appSwipeRight.appPackage.isNotEmpty())
-            launchApp(prefs.appSwipeLeft)
+            launchApp(prefs.appSwipeRight)
         else openDialerApp(requireContext())
     }
 
@@ -313,7 +313,7 @@ class HomeFragment : Fragment(), View.OnClickListener, View.OnLongClickListener 
             override fun onLongClick() {
                 super.onLongClick()
                 try {
-                    findNavController().navigate(R.id.settingsFragment)
+                    findNavController().navigate(R.id.action_mainFragment_to_settingsFragment)
                 } catch (e: Exception) {
                     e.printStackTrace()
                 }
