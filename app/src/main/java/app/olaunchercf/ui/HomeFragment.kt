@@ -3,6 +3,7 @@ package app.olaunchercf.ui
 import android.annotation.SuppressLint
 import android.app.admin.DevicePolicyManager
 import android.content.Context
+import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.os.Vibrator
@@ -313,13 +314,8 @@ class HomeFragment : Fragment(), View.OnClickListener, View.OnLongClickListener 
             override fun onLongClick() {
                 super.onLongClick()
                 try {
-                    val navController = findNavController()
-                    val destination = navController.graph.findNode(R.id.settingsFragment)
-                    if (destination != null) {
-                        navController.navigate(R.id.settingsFragment)
-                    } else {
-                        showAppList(AppDrawerFlag.LaunchApp)
-                    }
+                    val intent = Intent(requireContext(), SettingsActivity::class.java)
+                    startActivity(intent)
                 } catch (e: Exception) {
                     e.printStackTrace()
                 }
