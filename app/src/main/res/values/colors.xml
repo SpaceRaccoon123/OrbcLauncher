@@ -27,5 +27,6 @@
     <color name="blackInverseTrans50">#80FFFFFF</color>
     <color name="blackInverseTrans80">#CCFFFFFF</color>
     <color name="blackInverseTrans90">#E6FFFFFF</color>
+    <color name="ic_launcher_background">#1A1A1A</color>
 
 </resources>
