@@ -29,6 +29,7 @@ import app.olaunchercf.databinding.FragmentHomeBinding
 import app.olaunchercf.helper.*
 import app.olaunchercf.listener.OnSwipeTouchListener
 import app.olaunchercf.listener.ViewSwipeTouchListener
+import app.olaunchercf.settings.SettingsActivity
 import kotlinx.coroutines.launch
 
 class HomeFragment : Fragment(), View.OnClickListener, View.OnLongClickListener {
