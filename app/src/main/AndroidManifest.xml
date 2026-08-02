@@ -18,7 +18,7 @@
         
 
         <activity
-            android:name=".MainActivity"
+            android:name="app.olaunchercf.MainActivity"
             android:configChanges="uiMode"
             android:excludeFromRecents="true"
             android:launchMode="singleTask"
