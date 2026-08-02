@@ -3,7 +3,6 @@ package app.olaunchercf.ui
 import android.annotation.SuppressLint
 import android.app.admin.DevicePolicyManager
 import android.content.Context
-import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.os.Vibrator
@@ -29,7 +28,6 @@ import app.olaunchercf.databinding.FragmentHomeBinding
 import app.olaunchercf.helper.*
 import app.olaunchercf.listener.OnSwipeTouchListener
 import app.olaunchercf.listener.ViewSwipeTouchListener
-import app.olaunchercf.settings.SettingsActivity
 import kotlinx.coroutines.launch
 
 class HomeFragment : Fragment(), View.OnClickListener, View.OnLongClickListener {
@@ -197,7 +195,7 @@ class HomeFragment : Fragment(), View.OnClickListener, View.OnLongClickListener 
 
     private fun openSwipeRightApp() {
         if (prefs.appSwipeRight.appPackage.isNotEmpty())
-            launchApp(prefs.appSwipeRight)
+            launchApp(prefs.appSwipeLeft)
         else openDialerApp(requireContext())
     }
 
@@ -315,8 +313,7 @@ class HomeFragment : Fragment(), View.OnClickListener, View.OnLongClickListener 
             override fun onLongClick() {
                 super.onLongClick()
                 try {
-                    val intent = Intent(requireContext(), SettingsActivity::class.java)
-                    startActivity(intent)
+                    findNavController().navigate(R.id.settingsFragment)
                 } catch (e: Exception) {
                     e.printStackTrace()
                 }
