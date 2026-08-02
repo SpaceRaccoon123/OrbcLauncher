@@ -1,24 +1,19 @@
 package app.olaunchercf.ui
 
-import SettingsTheme
-import android.app.Activity
 import android.app.admin.DevicePolicyManager
 import android.content.ComponentName
 import android.content.Context
-import android.content.Intent
 import android.os.Build
 import android.os.Bundle
-import android.provider.Settings
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ScrollView
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -26,7 +21,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
@@ -81,14 +75,7 @@ class SettingsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         binding.testView.setContent {
-
-            val isDark = when (prefs.appTheme) {
-                Light -> false
-                Dark -> true
-                System -> isSystemInDarkTheme()
-            }
-
-            SettingsTheme(isDark) {
+            MaterialTheme {
                 Settings((prefs.textSize - offset).sp)
             }
         }
@@ -101,7 +88,7 @@ class SettingsFragment : Fragment() {
         val changeLauncherText = if (isOlauncherDefault(requireContext())) {
             R.string.change_default_launcher
         } else {
-           R.string.set_as_default_launcher
+            R.string.set_as_default_launcher
         }
 
         Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
@@ -109,15 +96,15 @@ class SettingsFragment : Fragment() {
                 stringResource(R.string.app_name),
                 onClick = { openAppInfo(requireContext(), android.os.Process.myUserHandle(), BuildConfig.APPLICATION_ID) },
             ) {
-                SimpleTextButton(stringResource(R.string.hidden_apps) ) {
+                SimpleTextButton(stringResource(R.string.hidden_apps)) {
                     showHiddenApps()
                 }
-                SimpleTextButton(stringResource(changeLauncherText) ) {
+                SimpleTextButton(stringResource(changeLauncherText)) {
                     resetDefaultLauncher(requireContext())
                 }
             }
 
-            // --- NEW: ORBC CONTROLS SECTION ---
+            // --- ORBC CONTROLS SECTION ---
             SettingsArea(
                 title = "Orbc Controls",
                 selected = selected,
@@ -207,7 +194,8 @@ class SettingsFragment : Fragment() {
                     }
                 )
             )
-            SettingsArea(title = stringResource(R.string.behavior),
+            SettingsArea(
+                title = stringResource(R.string.behavior),
                 selected = selected,
                 items = arrayOf(
                     { _, onChange ->
@@ -226,7 +214,8 @@ class SettingsFragment : Fragment() {
                     },
                 )
             )
-            SettingsArea(title = stringResource(R.string.homescreen),
+            SettingsArea(
+                title = stringResource(R.string.homescreen),
                 selected = selected,
                 items = arrayOf(
                     { open, onChange ->
@@ -270,7 +259,8 @@ class SettingsFragment : Fragment() {
                     },
                 )
             )
-            SettingsArea(title = stringResource(R.string.alignment),
+            SettingsArea(
+                title = stringResource(R.string.alignment),
                 selected = selected,
                 items = arrayOf(
                     { open, onChange ->
@@ -312,7 +302,8 @@ class SettingsFragment : Fragment() {
                     },
                 )
             )
-            SettingsArea(title = stringResource(R.string.gestures),
+            SettingsArea(
+                title = stringResource(R.string.gestures),
                 selected = selected,
                 items = arrayOf(
                     { open, onChange ->
@@ -387,7 +378,8 @@ class SettingsFragment : Fragment() {
                     }
                 )
             )
-            SettingsArea(title = getString(R.string.backup),
+            SettingsArea(
+                title = getString(R.string.backup),
                 selected = selected,
                 items = arrayOf(
                     { _, _ ->
@@ -401,13 +393,11 @@ class SettingsFragment : Fragment() {
                 )
             )
 
-            // version number
             Text(
                 modifier = Modifier
                     .align(Alignment.End)
                     .padding(10.dp, 5.dp),
                 text = "Version: ${requireContext().packageManager.getPackageInfo(requireContext().packageName, 0).versionName}",
-
                 color = Color.DarkGray
             )
         }
@@ -438,8 +428,7 @@ class SettingsFragment : Fragment() {
     }
 
     private fun toggleHomeAppsBottom() {
-        val onBottom  = !prefs.homeAlignmentBottom
-
+        val onBottom = !prefs.homeAlignmentBottom
         prefs.homeAlignmentBottom = onBottom
         viewModel.updateHomeAppsAlignment(prefs.homeAlignment, onBottom)
     }
@@ -501,6 +490,7 @@ class SettingsFragment : Fragment() {
         prefs.language = lang_int
         requireActivity().recreate()
     }
+
     private fun setTextSize(size: Int) {
         prefs.textSize = size
     }
@@ -515,11 +505,11 @@ class SettingsFragment : Fragment() {
             AppDrawerFlag.SetClickDate -> prefs.clickDateAction = action
             AppDrawerFlag.SetDoubleTap -> prefs.doubleTapAction = action
             AppDrawerFlag.SetHomeApp,
-                AppDrawerFlag.HiddenApps,
-                AppDrawerFlag.LaunchApp -> {}
+            AppDrawerFlag.HiddenApps,
+            AppDrawerFlag.LaunchApp -> {}
         }
 
-        when(action) {
+        when (action) {
             Action.OpenApp -> {
                 viewModel.getAppList()
                 findNavController().navigate(
