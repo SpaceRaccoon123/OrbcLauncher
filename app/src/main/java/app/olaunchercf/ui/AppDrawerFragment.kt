@@ -3,7 +3,6 @@ package app.olaunchercf.ui
 import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
@@ -17,9 +16,9 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import app.olaunchercf.MainViewModel
-import app.olaunchercf.OrbitalLayoutManager
 import app.olaunchercf.R
 import app.olaunchercf.data.AppModel
 import app.olaunchercf.data.Constants
@@ -40,7 +39,7 @@ class AppDrawerFragment : Fragment() {
     ): View {
         _binding = FragmentAppDrawerBinding.inflate(inflater, container, false)
 
-        context?.let{
+        context?.let {
             if (Prefs(it).firstOpen()) {
                 binding.appDrawerTip.visibility = View.VISIBLE
             }
@@ -81,7 +80,7 @@ class AppDrawerFragment : Fragment() {
 
         val prefs = Prefs(requireContext())
 
-        val gravity = when(prefs.drawerAlignment) {
+        val gravity = when (prefs.drawerAlignment) {
             Constants.Gravity.Left -> Gravity.LEFT
             Constants.Gravity.Center -> Gravity.CENTER
             Constants.Gravity.Right -> Gravity.RIGHT
@@ -101,14 +100,8 @@ class AppDrawerFragment : Fragment() {
 
         initViewModel(flag, viewModel, appAdapter)
 
-        // Attach Orbital Layout Manager to the App Drawer RecyclerView
-        binding.recyclerView.layoutManager = OrbitalLayoutManager(
-            context = requireContext(),
-            radiusFactor = prefs.drawerCurveRadius,
-            isRightHanded = (prefs.drawerAlignment == Constants.Gravity.Right),
-            isOrbitalEnabled = prefs.isDrawerOrbitalEnabled,
-            isHapticsEnabled = prefs.isHapticsEnabled
-        )
+        // Using standard LinearLayoutManager prevents layout calculation crashes on swipe-up
+        binding.recyclerView.layoutManager = LinearLayoutManager(requireContext())
 
         binding.recyclerView.adapter = appAdapter
         binding.recyclerView.addOnScrollListener(getRecyclerViewOnScrollListener())
@@ -208,7 +201,7 @@ class AppDrawerFragment : Fragment() {
             newSet.addAll(prefs.hiddenApps)
 
             if (flag == AppDrawerFlag.HiddenApps) {
-                newSet.remove(appModel.appPackage) // for backward compatibility
+                newSet.remove(appModel.appPackage)
                 newSet.remove(appModel.appPackage + "|" + appModel.user.toString())
             } else newSet.add(appModel.appPackage + "|" + appModel.user.toString())
 
