@@ -313,13 +313,15 @@ class HomeFragment : Fragment(), View.OnClickListener, View.OnLongClickListener 
             override fun onLongClick() {
                 super.onLongClick()
                 try {
-                    findNavController().navigate(R.id.action_mainFragment_to_settingsFragment)
-                } catch (e: Exception) {
-                    try {
-                        findNavController().navigate(R.id.settingsFragment)
-                    } catch (navEx: Exception) {
-                        navEx.printStackTrace()
+                    val navController = findNavController()
+                    val destination = navController.graph.findNode(R.id.settingsFragment)
+                    if (destination != null) {
+                        navController.navigate(R.id.settingsFragment)
+                    } else {
+                        showAppList(AppDrawerFlag.LaunchApp)
                     }
+                } catch (e: Exception) {
+                    e.printStackTrace()
                 }
             }
 
